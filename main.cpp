@@ -55,33 +55,27 @@ int main(int argc, char** argv) {
     float INF = std::numeric_limits<float>::max(); //infinity
        
     
-    vector<vector<float> > minValue(M, vector<float>(N,INF)); 
-    
-    // row index: state value
-    vector<vector<float> > optCtrl(N, vector<float>(1,INF));
-    
+    vector<vector<float> > minValue(M, vector<float>(N,INF));  
+    vector<vector<float> > optCtrl(M, vector<float>(N,INF));
     
     
     for (int i=minValue.size()-1; i>=0;i--) //stage index
     {
-        //cout << "Stage " << i <<endl;
+        cout << "Stage " << i <<endl;
         
         for (int j=0; j!=minValue[i].size(); j++) //stateValue index: node index
         {
-            //cout << "State " << j <<endl;
+            cout << "State " << j <<endl;
             if (i==N-1)
             {
                 minValue[i][j] = stageCost[j][K-1];
-                //optCtrl[j].clear();
-                //optCtrl[j].push_back(K-1);
-                optCtrl[j].assign(1,K-1);  
-                //cout << "assign size " <<optCtrl[j].size()<<endl;
-                          
+                optCtrl[i][j] = K;
+                
             }
             else
             {
-                minValue[i][j] = minValue[i+1][j];                
-                
+                minValue[i][j] = minValue[i+1][j];
+                optCtrl[i][j] = j+1;
                 
                         
                 for(int k=0; k!= K; k++) //control index: node index 
@@ -94,41 +88,36 @@ int main(int argc, char** argv) {
                    if (tmp < minValue[i][j])
                    {
                        minValue[i][j] = tmp; 
+                       optCtrl[i][j] =  k+1;
                        
+                       for (int m=i+1; m!=minValue[i].size()-1;m++)
+                            optCtrl[m][j] = optCtrl[m][k];
+                               
                        
-                       
-                       //optCtrl[j].clear();
-                       //for (int m=0; m!=optCtrl[k].size()-1;m++)
-                           //optCtrl[j].push_back(optCtrl[k][m]);
-                       
-                       optCtrl[j].assign(optCtrl[k].begin(), optCtrl[k].end());
-                       optCtrl[j].push_back(k);
-                       
-                       //cout << "shorter path " << minValue[i][j]<<" Control "<<optCtrl[i][j]<<endl;                   
+                       cout << "shorter path " << minValue[i][j]<<" Control "<<optCtrl[i][j]<<endl;                   
                    } 
                 }   
             }
             
-           //cout << "MinValue"<< minValue[i][j]<<", " <<" Control "<< optCtrl[i][j]<<endl;;  
+           cout << "MinValue"<< minValue[i][j]<<", " <<" Control "<< optCtrl[i][j]<<endl;;  
         }
         //cout << endl;
     }
             
     
-    cout << "Shortest Path " << endl;
+    cout << "Shortest Path (Read by Column) " << endl;
     
    for (int i=0; i!=optCtrl.size();++i)
     {
         for (int j=0; j!=optCtrl[i].size(); ++j)
         {
-            cout << optCtrl[i][j]+1<< "<-";        
+            cout << optCtrl[i][j]<< ", ";        
         }
-        cout << i+1<<endl;
+        cout << endl;
     }
+
     
-    
-/* cout << "Shortest Path (Read by Column) " << endl;    
- * for (int j=0; j!=optCtrl.size();++j)
+/*     for (int j=0; j!=optCtrl.size();++j)
     {
         for (int k=0; k!=optCtrl[j].size(); ++k)
         {
@@ -136,11 +125,11 @@ int main(int argc, char** argv) {
         }
         cout << endl;
     }
-*/   
+*/    
     
     cout << "Minimum Value " << endl;
     for (int j=0; j!=minValue[0].size(); j++)
-    cout<<"from state " << j << ": " << minValue[0][j]<< endl;
+    cout<<minValue[0][j]<<", ";
     
  
     return 0;
